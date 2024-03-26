@@ -10,31 +10,6 @@ MAX_SPEED = 3
 MAX_FORCE = 0.1
 NEIGHBOR_DIST = 50
 
-# create the boid and the flock outside of the do_GET method
-position = Vector(WIDTH / 2, HEIGHT / 2)
-boid = Boid(position)
-boids = [Boid(Vector(random.uniform(0, WIDTH), random.uniform(0, HEIGHT))) for _ in range(NUM_BOIDS)]
-
-class handler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        # apply alignment force and update the boid
-        alignment_force = alignment(boid, boids)
-        boid.apply_force(alignment_force)
-        boid.update()
-
-        # update the flock
-        for other_boid in boids:
-            other_alignment_force = alignment(other_boid, boids)
-            other_boid.apply_force(other_alignment_force)
-            other_boid.update()
-
-        # send boid position as JSON
-        self.send_response(200)
-        self.send_header('Content-type', 'application/json')
-        self.end_headers()
-        self.wfile.write(json.dumps({'boid_position': {'x': boid.position.x, 'y': boid.position.y}}).encode())
-        return
-
 class Vector:
     def __init__(self, x, y):
         self.x = x
@@ -118,3 +93,28 @@ def cohesion(boid, boids):
         steering.x = max(-MAX_FORCE, min(MAX_FORCE, steering.x))
         steering.y = max(-MAX_FORCE, min(MAX_FORCE, steering.y))
     return steering
+
+# create the boid and the flock outside of the do_GET method
+position = Vector(WIDTH / 2, HEIGHT / 2)
+boid = Boid(position)
+boids = [Boid(Vector(random.uniform(0, WIDTH), random.uniform(0, HEIGHT))) for _ in range(NUM_BOIDS)]
+
+class handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        # apply alignment force and update the boid
+        alignment_force = alignment(boid, boids)
+        boid.apply_force(alignment_force)
+        boid.update()
+
+        # update the flock
+        for other_boid in boids:
+            other_alignment_force = alignment(other_boid, boids)
+            other_boid.apply_force(other_alignment_force)
+            other_boid.update()
+
+        # send boid position as JSON
+        self.send_response(200)
+        self.send_header('Content-type', 'application/json')
+        self.end_headers()
+        self.wfile.write(json.dumps({'boid_position': {'x': boid.position.x, 'y': boid.position.y}}).encode())
+        return
