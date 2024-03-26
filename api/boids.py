@@ -1,3 +1,5 @@
+from http.server import BaseHTTPRequestHandler
+import json
 import random
 import math
 
@@ -7,6 +9,23 @@ BOID_RADIUS = 3
 MAX_SPEED = 3
 MAX_FORCE = 0.1
 NEIGHBOR_DIST = 50
+
+class handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        # create a boid and apply alignment force
+        position = Vector(WIDTH / 2, HEIGHT / 2)
+        boid = Boid(position)
+        boids = [Boid(Vector(random.uniform(0, WIDTH), random.uniform(0, HEIGHT))) for _ in range(100)]
+        alignment_force = alignment(boid, boids)
+        boid.apply_force(alignment_force)
+        boid.update()
+
+        # send boid position as JSON response
+        self.send_response(200)
+        self.send_header('Content-type', 'application/json')
+        self.end_headers()
+        self.wfile.write(json.dumps({'boid_position': {'x': boid.position.x, 'y': boid.position.y}}).encode())
+        return
 
 class Vector:
     def __init__(self, x, y):

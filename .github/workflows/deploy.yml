@@ -1,4 +1,4 @@
-name: Deploy Backend
+name: Deploy
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -17,6 +17,4 @@ jobs:
         run: npm i -g vercel
 
       - name: Deploy to Vercel
-        run: |
-          cd backend
-          vercel --token ${{ secrets.DEPLOY_TOKEN }} --prod --confirm --name boids-backend
+        run: vercel --token ${{ secrets.VERCEL_TOKEN }} --prod --confirm --name boids-sim
