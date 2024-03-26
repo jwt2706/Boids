@@ -4,13 +4,15 @@
     <title>Boids Simulation</title>
     <script>
       window.onload = function () {
-        fetch("/api/boids")
-          .then((response) => response.json())
-          .then((data) => {
-            const circle = document.getElementById("boid");
-            circle.setAttribute("cx", data.boid_position.x);
-            circle.setAttribute("cy", data.boid_position.y);
-          });
+        setInterval(() => {
+          fetch("/api/boids")
+            .then((response) => response.json())
+            .then((data) => {
+              const circle = document.getElementById("boid");
+              circle.setAttribute("cx", data.boid_position.x);
+              circle.setAttribute("cy", data.boid_position.y);
+            });
+        }, 1000);
       };
     </script>
   </head>
