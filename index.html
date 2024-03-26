@@ -4,21 +4,27 @@
     <title>Boids Simulation</title>
     <script>
       window.onload = function () {
-        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-        const socket = new WebSocket(
-          `${protocol}//${window.location.host}/api/boids`
-        );
-
-        socket.onmessage = function (event) {
-          const data = JSON.parse(event.data);
-          const svg = document.querySelector("svg");
-          svg.innerHTML = data.boids_positions
-            .map(
-              (position) =>
-                `<circle r="5" fill="black" cx="${position.x}" cy="${position.y}" />`
-            )
-            .join("");
-        };
+        let allBoidsPositions = [];
+        let index = 0;
+        setInterval(() => {
+          if (index < allBoidsPositions.length) {
+            const svg = document.querySelector("svg");
+            svg.innerHTML = allBoidsPositions[index]
+              .map(
+                (position) =>
+                  `<circle r="5" fill="black" cx="${position.x}" cy="${position.y}" />`
+              )
+              .join("");
+            index++;
+          } else {
+            fetch("/api/boids")
+              .then((response) => response.json())
+              .then((data) => {
+                allBoidsPositions = data.all_boids_positions;
+                index = 0;
+              });
+          }
+        }, 500);
       };
     </script>
   </head>
