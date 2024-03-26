@@ -1,4 +1,5 @@
 from http.server import BaseHTTPRequestHandler
+import websockets
 import json
 import random
 import math
@@ -99,28 +100,27 @@ position = Vector(WIDTH / 2, HEIGHT / 2)
 boid = Boid(position)
 boids = [Boid(Vector(random.uniform(0, WIDTH), random.uniform(0, HEIGHT))) for _ in range(NUM_BOIDS)]
 
-class handler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        # send positions of all boids for the next 10 updates as JSON
-        all_boids_positions = []
-        for _ in range(10):
-            # apply alignment force and update the boid
-            alignment_force = alignment(boid, boids)
-            boid.apply_force(alignment_force)
-            boid.update()
+async def handler(websocket, path):
+    while True:
+        # apply alignment force and update the boid
+        alignment_force = alignment(boid, boids)
+        boid.apply_force(alignment_force)
+        boid.update()
 
-            # update the flock
-            for other_boid in boids:
-                other_alignment_force = alignment(other_boid, boids)
-                other_boid.apply_force(other_alignment_force)
-                other_boid.update()
+        # update the flock
+        for other_boid in boids:
+            other_alignment_force = alignment(other_boid, boids)
+            other_boid.apply_force(other_alignment_force)
+            other_boid.update()
 
-            # add positions of all boids to the list
-            boids_positions = [{'x': boid.position.x, 'y': boid.position.y} for boid in boids]
-            all_boids_positions.append(boids_positions)
+        # send positions of all boids as JSON
+        boids_positions = [{'x': boid.position.x, 'y': boid.position.y} for boid in boids]
+        await websocket.send(json.dumps({'boids_positions': boids_positions}))
 
-        self.send_response(200)
-        self.send_header('Content-type', 'application/json')
-        self.end_headers()
-        self.wfile.write(json.dumps({'all_boids_positions': all_boids_positions}).encode())
-        return
+        # wait for a short period before sending the next update
+        await asyncio.sleep(0.1)
+
+start_server = websockets.serve(handler, 'localhost', 8765)
+
+asyncio.get_event_loop().run_until_complete(start_server)
+asyncio.get_event_loop().run_forever()
