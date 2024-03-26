@@ -112,9 +112,10 @@ class handler(BaseHTTPRequestHandler):
             other_boid.apply_force(other_alignment_force)
             other_boid.update()
 
-        # send boid position as JSON
+        # send positions of all boids as JSON
         self.send_response(200)
         self.send_header('Content-type', 'application/json')
         self.end_headers()
-        self.wfile.write(json.dumps({'boid_position': {'x': boid.position.x, 'y': boid.position.y}}).encode())
+        boids_positions = [{'x': boid.position.x, 'y': boid.position.y} for boid in boids]
+        self.wfile.write(json.dumps({'boids_positions': boids_positions}).encode())
         return

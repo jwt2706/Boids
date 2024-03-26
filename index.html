@@ -8,17 +8,19 @@
           fetch("/api/boids")
             .then((response) => response.json())
             .then((data) => {
-              const circle = document.getElementById("boid");
-              circle.setAttribute("cx", data.boid_position.x);
-              circle.setAttribute("cy", data.boid_position.y);
+              const svg = document.querySelector("svg");
+              svg.innerHTML = data.boids_positions
+                .map(
+                  (position) =>
+                    `<circle r="5" fill="black" cx="${position.x}" cy="${position.y}" />`
+                )
+                .join("");
             });
-        }, 1000);
+        }, 100);
       };
     </script>
   </head>
   <body>
-    <svg width="800" height="600">
-      <circle id="boid" r="5" fill="black" />
-    </svg>
+    <svg width="800" height="600"></svg>
   </body>
 </html>
