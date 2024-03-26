@@ -1,4 +1,5 @@
 from http.server import BaseHTTPRequestHandler
+import websocket
 import json
 import random
 import math
@@ -99,8 +100,8 @@ position = Vector(WIDTH / 2, HEIGHT / 2)
 boid = Boid(position)
 boids = [Boid(Vector(random.uniform(0, WIDTH), random.uniform(0, HEIGHT))) for _ in range(NUM_BOIDS)]
 
-class handler(BaseHTTPRequestHandler):
-    def do_GET(self):
+async def handler(websocket, path):
+    while True:
         # apply alignment force and update the boid
         alignment_force = alignment(boid, boids)
         boid.apply_force(alignment_force)
@@ -113,9 +114,10 @@ class handler(BaseHTTPRequestHandler):
             other_boid.update()
 
         # send positions of all boids as JSON
-        self.send_response(200)
-        self.send_header('Content-type', 'application/json')
-        self.end_headers()
         boids_positions = [{'x': boid.position.x, 'y': boid.position.y} for boid in boids]
-        self.wfile.write(json.dumps({'boids_positions': boids_positions}).encode())
-        return
+        await websocket.send(json.dumps({'boids_positions': boids_positions}))
+
+start_server = websockets.serve(handler, 'localhost', 8765)
+
+asyncio.get_event_loop().run_until_complete(start_server)
+asyncio.get_event_loop().run_forever()
