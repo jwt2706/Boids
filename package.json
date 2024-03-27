@@ -1,0 +1,15 @@
+{
+  "name": "boidssim",
+  "version": "1.0.0",
+  "description": "This project simulates the flocking behavior of birds using the [Boids algorithm](https://en.wikipedia.org/wiki/Boids).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "jwt2706",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "p5": "^1.9.2",
+    "vite": "^5.2.6"
+  }
+}

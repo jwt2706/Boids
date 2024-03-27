@@ -1,41 +1,9 @@
 <!DOCTYPE html>
-<html style="height: 100%; margin: 0; padding: 0">
+<html>
   <head>
     <title>Boids Simulation</title>
-    <style>
-      body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-      }
-      svg {
-        display: block;
-        width: 100%;
-        height: 100%;
-      }
-    </style>
-    <script>
-      window.onload = function () {
-        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-        const socket = new WebSocket(
-          `${protocol}//${window.location.host}/api/boids`
-        );
-
-        socket.onmessage = function (event) {
-          const data = JSON.parse(event.data);
-          const svg = document.querySelector("svg");
-          svg.innerHTML = data.boids_positions
-            .map(
-              (position) =>
-                `<circle r="5" fill="black" cx="${position.x}" cy="${position.y}" />`
-            )
-            .join("");
-        };
-      };
-    </script>
   </head>
   <body>
-    <svg></svg>
+    <script src="src/boids.js"></script>
   </body>
 </html>
