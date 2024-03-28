@@ -1,5 +1,3 @@
-import p5 from 'p5';
-
 const NUMBER_OF_BOIDS = 100;
 
 class Boid {
