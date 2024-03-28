@@ -2,6 +2,8 @@
 
 This project simulates the flocking behavior of birds using an implementation of the [Boids algorithm](https://en.wikipedia.org/wiki/Boids).
 
+See the simulationf or yourself [here](https://jwt2706.github.io/Boids)!
+
 <img src="recording.gif" alt="Recording" width="500"/>
 
 ## Overview
