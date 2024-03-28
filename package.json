@@ -4,11 +4,15 @@
   "description": "This project simulates the flocking behavior of birds using the [Boids algorithm](https://en.wikipedia.org/wiki/Boids).",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "deploy": "gh-pages -d dist"
   },
   "author": "jwt2706",
   "license": "Apache-2.0",
   "dependencies": {
+    "gh-pages": "^6.1.1",
     "p5": "^1.9.2",
     "vite": "^5.2.6"
   }
