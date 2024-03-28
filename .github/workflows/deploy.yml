@@ -1,28 +1,30 @@
-name: Deploy Main
-
+name: Build and Deploy
 on:
   push:
     branches:
       - main
 
 jobs:
-  deploy:
-    runs-on: macos-latest
-
+  build-and-deploy:
+    runs-on: macos-latest # macs because speed :)
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install dependencies
-        run: npm install
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "18"
+
+      - name: Install Dependencies
+        run: npm ci
 
       - name: Build
         run: npm run build
 
-      - name: Deploy
+      - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
           publish_branch: gh-pages
-          commit_message: "update gh-pages"
