@@ -4,7 +4,10 @@ class Boid {
   constructor(p) {
     this.p = p; // p5 instance
     // init in a random position in the canvas
-    this.position = this.p.createVector(this.p.random(this.p.width), this.p.random(this.p.height));
+    this.position = this.p.createVector(
+      this.p.random(this.p.width),
+      this.p.random(this.p.height)
+    );
     this.velocity = p5.Vector.random2D();
     this.acceleration = this.p.createVector();
     this.maxForce = 0.2;
@@ -31,7 +34,12 @@ class Boid {
     let steering = this.p.createVector();
     let total = 0;
     for (let other of boids) {
-      let d = this.p.dist(this.position.x, this.position.y, other.position.x, other.position.y);
+      let d = this.p.dist(
+        this.position.x,
+        this.position.y,
+        other.position.x,
+        other.position.y
+      );
       if (other != this && d < perceptionRadius) {
         steering.add(other.velocity);
         total++;
@@ -52,7 +60,12 @@ class Boid {
     let steering = this.p.createVector();
     let total = 0;
     for (let other of boids) {
-      let d = this.p.dist(this.position.x, this.position.y, other.position.x, other.position.y);
+      let d = this.p.dist(
+        this.position.x,
+        this.position.y,
+        other.position.x,
+        other.position.y
+      );
       if (other != this && d < perceptionRadius) {
         steering.add(other.position);
         total++;
@@ -74,7 +87,12 @@ class Boid {
     let steering = this.p.createVector();
     let total = 0;
     for (let other of boids) {
-      let d = this.p.dist(this.position.x, this.position.y, other.position.x, other.position.y);
+      let d = this.p.dist(
+        this.position.x,
+        this.position.y,
+        other.position.x,
+        other.position.y
+      );
       if (other != this && d < perceptionRadius) {
         let diff = p5.Vector.sub(this.position, other.position);
         diff.div(d * d);
@@ -108,9 +126,17 @@ class Boid {
 
   // draw boid
   show() {
-    this.p.strokeWeight(8);
     this.p.stroke(255);
-    this.p.point(this.position.x, this.position.y);
+    this.p.fill(255);
+    this.p.push();
+    this.p.translate(this.position.x, this.position.y);
+    this.p.rotate(this.velocity.heading() + this.p.PI / 2);
+    this.p.beginShape();
+    this.p.vertex(0, -8); // top point
+    this.p.vertex(-5, 5); // bottom left point
+    this.p.vertex(5, 5); // bottom right point
+    this.p.endShape(this.p.CLOSE);
+    this.p.pop();
   }
 }
 
