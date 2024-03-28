@@ -2,6 +2,8 @@
 
 This project simulates the flocking behavior of birds using an implementation of the [Boids algorithm](https://en.wikipedia.org/wiki/Boids).
 
+<img src="recording.gif" alt="Recording" width="500"/>
+
 ## Overview
 
 The Boids algorithm models the behavior of an individual bird within a flock through three simple rules:
