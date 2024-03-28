@@ -1,123 +1,142 @@
+import p5 from 'p5';
+
+const NUMBER_OF_BOIDS = 100;
+
 class Boid {
-    constructor() {
-      this.position = createVector(random(width), random(height));
-      this.velocity = p5.Vector.random2D();
-      this.acceleration = createVector();
-      this.maxForce = 0.2;
-      this.maxSpeed = 4;
+  constructor(p) {
+    this.p = p; // p5 instance
+    // init in a random position in the canvas
+    this.position = this.p.createVector(this.p.random(this.p.width), this.p.random(this.p.height));
+    this.velocity = p5.Vector.random2D();
+    this.acceleration = this.p.createVector();
+    this.maxForce = 0.2;
+    this.maxSpeed = 4;
+  }
+
+  // make boids wrap around the canvas
+  edges() {
+    if (this.position.x > this.p.width) {
+      this.position.x = 0;
+    } else if (this.position.x < 0) {
+      this.position.x = this.p.width;
     }
-  
-    edges() {
-      if (this.position.x > width) {
-        this.position.x = 0;
-      } else if (this.position.x < 0) {
-        this.position.x = width;
-      }
-      if (this.position.y > height) {
-        this.position.y = 0;
-      } else if (this.position.y < 0) {
-        this.position.y = height;
-      }
-    }
-  
-    align(boids) {
-      let perceptionRadius = 50;
-      let steering = createVector();
-      let total = 0;
-      for (let other of boids) {
-        let d = dist(this.position.x, this.position.y, other.position.x, other.position.y);
-        if (other != this && d < perceptionRadius) {
-          steering.add(other.velocity);
-          total++;
-        }
-      }
-      if (total > 0) {
-        steering.div(total);
-        steering.setMag(this.maxSpeed);
-        steering.sub(this.velocity);
-        steering.limit(this.maxForce);
-      }
-      return steering;
-    }
-  
-    cohesion(boids) {
-      let perceptionRadius = 50;
-      let steering = createVector();
-      let total = 0;
-      for (let other of boids) {
-        let d = dist(this.position.x, this.position.y, other.position.x, other.position.y);
-        if (other != this && d < perceptionRadius) {
-          steering.add(other.position);
-          total++;
-        }
-      }
-      if (total > 0) {
-        steering.div(total);
-        steering.sub(this.position);
-        steering.setMag(this.maxSpeed);
-        steering.sub(this.velocity);
-        steering.limit(this.maxForce);
-      }
-      return steering;
-    }
-  
-    separation(boids) {
-      let perceptionRadius = 50;
-      let steering = createVector();
-      let total = 0;
-      for (let other of boids) {
-        let d = dist(this.position.x, this.position.y, other.position.x, other.position.y);
-        if (other != this && d < perceptionRadius) {
-          let diff = p5.Vector.sub(this.position, other.position);
-          diff.div(d * d);
-          steering.add(diff);
-          total++;
-        }
-      }
-      if (total > 0) {
-        steering.div(total);
-        steering.setMag(this.maxSpeed);
-        steering.sub(this.velocity);
-        steering.limit(this.maxForce);
-      }
-      return steering;
-    }
-  
-    flock(boids) {
-      this.acceleration.add(this.align(boids));
-      this.acceleration.add(this.cohesion(boids));
-      this.acceleration.add(this.separation(boids));
-    }
-  
-    update() {
-      this.position.add(this.velocity);
-      this.velocity.add(this.acceleration);
-      this.velocity.limit(this.maxSpeed);
-      this.acceleration.mult(0);
-    }
-  
-    show() {
-      strokeWeight(8);
-      stroke(255);
-      point(this.position.x, this.position.y);
+    if (this.position.y > this.p.height) {
+      this.position.y = 0;
+    } else if (this.position.y < 0) {
+      this.position.y = this.p.height;
     }
   }
-  
+
+  // align boid with nearby boids
+  align(boids) {
+    let perceptionRadius = 50;
+    let steering = this.p.createVector();
+    let total = 0;
+    for (let other of boids) {
+      let d = this.p.dist(this.position.x, this.position.y, other.position.x, other.position.y);
+      if (other != this && d < perceptionRadius) {
+        steering.add(other.velocity);
+        total++;
+      }
+    }
+    if (total > 0) {
+      steering.div(total);
+      steering.setMag(this.maxSpeed);
+      steering.sub(this.velocity);
+      steering.limit(this.maxForce);
+    }
+    return steering;
+  }
+
+  // steer boid towards the average position of nearby boids
+  cohesion(boids) {
+    let perceptionRadius = 50;
+    let steering = this.p.createVector();
+    let total = 0;
+    for (let other of boids) {
+      let d = this.p.dist(this.position.x, this.position.y, other.position.x, other.position.y);
+      if (other != this && d < perceptionRadius) {
+        steering.add(other.position);
+        total++;
+      }
+    }
+    if (total > 0) {
+      steering.div(total);
+      steering.sub(this.position);
+      steering.setMag(this.maxSpeed);
+      steering.sub(this.velocity);
+      steering.limit(this.maxForce);
+    }
+    return steering;
+  }
+
+  // steer boid away from nearby boids to prevent collisions and crowding other boids
+  separation(boids) {
+    let perceptionRadius = 50;
+    let steering = this.p.createVector();
+    let total = 0;
+    for (let other of boids) {
+      let d = this.p.dist(this.position.x, this.position.y, other.position.x, other.position.y);
+      if (other != this && d < perceptionRadius) {
+        let diff = p5.Vector.sub(this.position, other.position);
+        diff.div(d * d);
+        steering.add(diff);
+        total++;
+      }
+    }
+    if (total > 0) {
+      steering.div(total);
+      steering.setMag(this.maxSpeed);
+      steering.sub(this.velocity);
+      steering.limit(this.maxForce);
+    }
+    return steering;
+  }
+
+  // using align, cohesion and separation to make the magic happen
+  flock(boids) {
+    this.acceleration.add(this.align(boids));
+    this.acceleration.add(this.cohesion(boids));
+    this.acceleration.add(this.separation(boids));
+  }
+
+  // update position, velocity and acceleration
+  update() {
+    this.position.add(this.velocity);
+    this.velocity.add(this.acceleration);
+    this.velocity.limit(this.maxSpeed);
+    this.acceleration.mult(0);
+  }
+
+  // draw boid
+  show() {
+    this.p.strokeWeight(8);
+    this.p.stroke(255);
+    this.p.point(this.position.x, this.position.y);
+  }
+}
+
+// p5 sketch
+const sim = (p) => {
   const flock = [];
-  
-  function setup() {
-    createCanvas(640, 360);
-    for (let i = 0; i < 100; i++) {
-      flock.push(new Boid());
+
+  p.setup = () => {
+    p.createCanvas(p.windowWidth, p.windowHeight);
+    // spawn boids
+    for (let i = 0; i < NUMBER_OF_BOIDS; i++) {
+      flock.push(new Boid(p));
     }
-  }
-  
-  function draw() {
-    background(51);
+  };
+
+  p.draw = () => {
+    p.background(0);
     for (let boid of flock) {
       boid.edges();
       boid.flock(flock);
       boid.update();
       boid.show();
     }
-  }
+  };
+};
+
+new p5(sim);
