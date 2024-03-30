@@ -1,4 +1,4 @@
-const NUMBER_OF_BOIDS = window.innerWidth <= 640 ? 25 : 100;
+const NUMBER_OF_BOIDS = window.innerWidth <= 640 ? 10 : 100;
 
 class Boid {
   constructor(p) {
